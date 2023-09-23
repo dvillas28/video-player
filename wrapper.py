@@ -11,7 +11,9 @@ import time
 pygame.init()
 
 # Create a display surface (for the still image)
-screen = pygame.display.set_mode((800, 600))
+screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+# screen.width = screen.get_rect().width
+# screen.height = screen.get_rect().height
 
 # Load your still image
 # image_path = "/path/to/your/still/image.jpg"
@@ -21,14 +23,21 @@ screen = pygame.display.set_mode((800, 600))
 clock = pygame.time.Clock()
 
 # Start the Bash script as a subprocess
-bash_process = subprocess.Popen(["./video_player.sh"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+bash_process = subprocess.Popen(["./video_player.sh"],
+                                stdin=subprocess.PIPE,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE,
+                                text=True,
+                                shell=True)
 # print(bash_process)
+
 
 # Function to display the still image
 def display_still_image():
     # screen.blit(image, (0, 0))
     screen.fill((0, 0, 0))
     pygame.display.flip()
+
 
 # Main loop
 running = True

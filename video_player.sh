@@ -55,10 +55,10 @@ while true; do
         kill_vlc
     fi
 
-    if [[ $key == "p" ]]; then
+    # if [[ $key == "p" ]]; then
         
-        feh --fullscreen /home/pi/Desktop/photo.jpeg &
-    fi
+    #     feh --fullscreen /home/pi/Desktop/photo.jpeg &
+    # fi
 
     # Check if VLC is running and kill it
     kill_vlc
@@ -67,7 +67,7 @@ while true; do
     if [[ ${videos[$key]} ]]; then
         # vlc --fullscreen ${videos[$key]} --play-and-exit >/dev/null 2>&1 &
         # vlc ${videos[$key]} --play-and-exit >/dev/null 2>&1 &
-        vlc ${videos[$key]} --play-and-exit &
+        vlc ${videos[$key]} --play-and-exit
 
         # go back to terminal (only for GUI)
         # sleep 1

@@ -85,5 +85,5 @@ if __name__ == '__main__':
     main_win = MainWindow(sys.argv[1])
     available_geometry = main_win.screen().availableGeometry()
     main_win.resize(300, 300)
-    main_win.showMaximized()
+    main_win.show()
     sys.exit(app.exec())

@@ -60,7 +60,7 @@ class MainWindow(QMainWindow):
     def load_and_play(self, key: int) -> None:
         path = self._videos[chr(key)].strip()
         url = QUrl.fromLocalFile(path)
-        self._player.setSource(url)
+        self._player.setMedia(QMediaContent(url))
         self._player.play()
 
     def security_stop(self):

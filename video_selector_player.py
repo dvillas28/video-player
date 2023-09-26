@@ -12,6 +12,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self, playlist_path):
         super().__init__()
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
 
         self._audio_output = QAudioOutput()
         self._player = QMediaPlayer()
@@ -19,6 +20,9 @@ class MainWindow(QMainWindow):
 
         self._video_widget = QVideoWidget()
         self.setCentralWidget(self._video_widget)
+
+        # para poder controlarlo con las teclas inmediatamente al comenzar
+        self._video_widget.setFocus()
         self._player.setVideoOutput(self._video_widget)
 
         self._player.errorOccurred.connect(self._player_error)
@@ -28,12 +32,13 @@ class MainWindow(QMainWindow):
         self._videos = {}  # key y su path asociado
         self.load_videos()
 
+        # TODO, poner una imagen de fondo en el widget central, luego que los videos se superpongan
+
     def _player_error(self, error, error_string):
         print(error_string, file=sys.stderr)
         # self.show_status_message(error_string)
 
     def keyPressEvent(self, event):
-
         # selected a video from the playlist
         if chr(event.key()).isnumeric():
             self.security_stop()
@@ -42,7 +47,8 @@ class MainWindow(QMainWindow):
         # closes
         elif event.key() == Qt.Key.Key_Z:
             self._player.stop()
-            QApplication.quit()
+            # QApplication.quit()
+            sys.exit()
 
         # pauses
         elif event.key() == Qt.Key.Key_X:
@@ -68,7 +74,7 @@ class MainWindow(QMainWindow):
             with open(os.path.join(self._playlist_path)) as arch:
                 lineas = arch.readlines()
                 for linea in lineas:
-                    linea = linea.strip()
+                    linea = os.path.join(linea.strip())
 
                 c = 0
                 for linea in lineas:
@@ -85,5 +91,5 @@ if __name__ == '__main__':
     main_win = MainWindow(sys.argv[1])
     available_geometry = main_win.screen().availableGeometry()
     main_win.resize(300, 300)
-    main_win.show()
+    main_win.showMaximized()
     sys.exit(app.exec())

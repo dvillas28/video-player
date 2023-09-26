@@ -15,5 +15,6 @@ python3 video_selector_player.py <path/to/playlist.txt>
 ## TODOs
 - Colocar imagen predeterminada de fondo
 - Capacidad de reproducir un video predeterminado de fondo
-- Hacerlo frameless de algun modo
+- Hacerlo frameless de algun modo - Done
+- Mantener Focus en el central Widget
 - Hasta el momento solo se pueden acceder los primeros 10 videos (teclas 0-9)

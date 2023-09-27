@@ -13,7 +13,6 @@ import os
 # en el archivo tenemos la duraccion de cada video
 
 
-# class MainWindow(QMainWindow):
 class MainWindow(QWidget):
 
     def __init__(self, playlist_path):
@@ -21,8 +20,8 @@ class MainWindow(QWidget):
         # gui
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
 
-        self._audio_output = QAudioOutput()
-        self._player = QMediaPlayer()
+        self._audio_output = QAudioOutput(self)
+        self._player = QMediaPlayer(self)
         self._player.setAudioOutput(self._audio_output)
 
         self.layout = QHBoxLayout(self)

@@ -12,7 +12,7 @@ python3 video_selector_player.py <path/to/playlist.txt>
 
 - `X` : para pausar reproductor
 - `C` : para reanudar reproductor
-- `space` : el video y cerrar el reproductor
+- `space` : detiene el video y oculta el reproductor
 - `Z` : cerrar programa
 
 ## TODOs ordenados por prioridad

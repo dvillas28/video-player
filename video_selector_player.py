@@ -108,13 +108,12 @@ class MainWindow(QWidget):
                 lineas = arch.readlines()
                 info_list = []
                 for linea in lineas:
-                    info_list.append(linea.strip().split(','))
+                    info_list.append(linea.strip())
 
                 c = 0
                 for video in info_list:
-                    video_path = os.path.join(video[0])
-                    dur = video[1]
-                    self._videos[str(c)] = (video_path, int(dur))
+                    video_path = os.path.join(video)
+                    self._videos[str(c)] = video_path
                     c += 1
 
         except FileNotFoundError:
@@ -128,7 +127,7 @@ class MainWindow(QWidget):
     def load_and_play(self, key: int) -> None:
         """ Se recibe un key, se carga y se reproduce un video """
         try:
-            path, duration = self._videos[chr(key)]
+            path = self._videos[chr(key)]
 
         except KeyError:
             print(f'> Error: Key "{chr(key)}" is not registered to any video')
@@ -136,7 +135,6 @@ class MainWindow(QWidget):
         else:
             self._video_widget.setHidden(False)
             self.security_stop()
-            self.curr_duration = duration
             url = QUrl.fromLocalFile(path)
             self._player.setSource(url)
             self._player.play()

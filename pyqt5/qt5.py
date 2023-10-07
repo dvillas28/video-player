@@ -139,12 +139,13 @@ class MainWindow(QWidget):
             print(f'> Error: Key "{chr(key)}" is not registered to any video')
 
         else:
-            path = f'videos/1984.mp4'
+            path = f'home/dvillas/video_player/videos/1984.mp4'
             self._video_widget.setHidden(False)
             self.security_stop()
             url = QUrl.fromLocalFile(path)
             print(url)
             # self._player.setSource(url)
+            print('SegFault acá abajo')
             self._player.setMedia(QMediaContent(url))
             self._player.play()
 
@@ -172,5 +173,6 @@ class MainWindow(QWidget):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     main_win = MainWindow(sys.argv[1])
+    # main_win = MainWindow('/home/dvillas/video_player/videos/playlist.txt')
     main_win.connect_senales()
     sys.exit(app.exec())

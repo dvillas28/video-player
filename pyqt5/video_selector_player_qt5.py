@@ -1,94 +1,123 @@
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QHBoxLayout, QVBoxLayout, QLabel, \
+    QSlider, QStyle, QSizePolicy, QFileDialog
 import sys
-from PyQt5.QtCore import Qt, QUrl
-from PyQt5.QtWidgets import (QApplication, QMainWindow)
-from PyQt5.QtMultimedia import (QAudioOutput, QMediaPlayer, QMediaContent)
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
-import time
-import os
-
-""" Version en PyQt5, para Raspberry Pi 3 """
-
-# please install sudo apt-get install libqt5multimedia5-plugins
+from PyQt5.QtGui import QIcon, QPalette
+from PyQt5.QtCore import Qt, QUrl
 
 
-class MainWindow(QMainWindow):
-
-    def __init__(self, playlist_path):
+class Window(QWidget):
+    def __init__(self):
         super().__init__()
 
-        # self._audio_output = QAudioOutput()
-        # self._player = QMediaPlayer()
-        # self._player.setAudioOutput(self._audio_output)
+        self.setWindowTitle("PyQt5 Media Player")
+        self.setGeometry(350, 100, 700, 500)
+        self.setWindowIcon(QIcon('player.png'))
 
-        self._player = QMediaPlayer(None, QMediaPlayer.VideoSurface)
-        self._video_widget = QVideoWidget()
+        p = self.palette()
+        p.setColor(QPalette.Window, Qt.black)
+        self.setPalette(p)
 
-        self.setCentralWidget(self._video_widget)
-        self._player.setVideoOutput(self._video_widget)
+        self.init_ui()
 
-        # self._player.errorOccurred.connect(self._player_error)
+        self.show()
 
-        self._playlist_path = playlist_path
+    def init_ui(self):
 
-        self._videos = {}  # key y su path asociado
-        self.load_videos()
+        # create media player object
+        self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
 
-    # def _player_error(self, error, error_string):
-    #     print(error_string, file=sys.stderr)
-    #     # self.show_status_message(error_string)
+        # create videowidget object
 
-    def keyPressEvent(self, event):
+        videowidget = QVideoWidget()
 
-        # selected a video from the playlist
-        if chr(event.key()).isnumeric():
-            self.security_stop()
-            self.load_and_play(event.key())
+        # create open button
+        openBtn = QPushButton('Open Video')
+        openBtn.clicked.connect(self.open_file)
 
-        # closes
-        elif event.key() == Qt.Key.Key_Z:
-            self._player.stop()
-            QApplication.quit()
+        # create button for playing
+        self.playBtn = QPushButton()
+        self.playBtn.setEnabled(False)
+        self.playBtn.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
+        self.playBtn.clicked.connect(self.play_video)
 
-        # pauses
-        elif event.key() == Qt.Key.Key_X:
-            self._player.pause()
+        # create slider
+        self.slider = QSlider(Qt.Horizontal)
+        self.slider.setRange(0, 0)
+        self.slider.sliderMoved.connect(self.set_position)
 
-        # reanudates
-        elif event.key() == Qt.Key.Key_C:
-            self._player.play()
+        # create label
+        self.label = QLabel()
+        self.label.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Maximum)
 
-    def load_and_play(self, key: int) -> None:
-        path = self._videos[chr(key)].strip()
-        url = QUrl.fromLocalFile(path)
-        self._player.setMedia(QMediaContent(url))
-        self._player.play()
+        # create hbox layout
+        hboxLayout = QHBoxLayout()
+        hboxLayout.setContentsMargins(0, 0, 0, 0)
 
-    def security_stop(self):
-        """ No funciona sin esto """
-        self._player.stop()
-        time.sleep(0.1)
+        # set widgets to the hbox layout
+        hboxLayout.addWidget(openBtn)
+        hboxLayout.addWidget(self.playBtn)
+        hboxLayout.addWidget(self.slider)
 
-    def load_videos(self):
-        try:
-            with open(os.path.join(self._playlist_path)) as arch:
-                lineas = arch.readlines()
-                for linea in lineas:
-                    linea = linea.strip()
+        # create vbox layout
+        vboxLayout = QVBoxLayout()
+        vboxLayout.addWidget(videowidget)
+        vboxLayout.addLayout(hboxLayout)
+        vboxLayout.addWidget(self.label)
 
-                c = 0
-                for linea in lineas:
-                    self._videos[str(c)] = linea
-                    c += 1
+        self.setLayout(vboxLayout)
 
-        except FileNotFoundError:
-            print(f'> Error: "{self._playlist_path}" is not a valid path')
-            sys.exit()
+        self.mediaPlayer.setVideoOutput(videowidget)
+
+        # media player signals
+
+        self.mediaPlayer.stateChanged.connect(self.mediastate_changed)
+        self.mediaPlayer.positionChanged.connect(self.position_changed)
+        self.mediaPlayer.durationChanged.connect(self.duration_changed)
+
+    def open_file(self):
+        filename, _ = QFileDialog.getOpenFileName(self, "Open Video")
+
+        if filename != '':
+            self.mediaPlayer.setMedia(
+                QMediaContent(QUrl.fromLocalFile(filename)))
+            self.playBtn.setEnabled(True)
+
+    def play_video(self):
+        if self.mediaPlayer.state() == QMediaPlayer.PlayingState:
+            self.mediaPlayer.pause()
+
+        else:
+            self.mediaPlayer.play()
+
+    def mediastate_changed(self, state):
+        if self.mediaPlayer.state() == QMediaPlayer.PlayingState:
+            self.playBtn.setIcon(
+                self.style().standardIcon(QStyle.SP_MediaPause)
+
+            )
+
+        else:
+            self.playBtn.setIcon(
+                self.style().standardIcon(QStyle.SP_MediaPlay)
+
+            )
+
+    def position_changed(self, position):
+        self.slider.setValue(position)
+
+    def duration_changed(self, duration):
+        self.slider.setRange(0, duration)
+
+    def set_position(self, position):
+        self.mediaPlayer.setPosition(position)
+
+    def handle_errors(self):
+        self.playBtn.setEnabled(False)
+        self.label.setText("Error: " + self.mediaPlayer.errorString())
 
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    main_win = MainWindow(sys.argv[1])
-    available_geometry = main_win.screen().availableGeometry()
-    main_win.resize(300, 300)
-    main_win.show()
-    sys.exit(app.exec())
+app = QApplication(sys.argv)
+window = Window()
+sys.exit(app.exec_())
